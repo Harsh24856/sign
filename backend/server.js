@@ -19,10 +19,7 @@ async function connectDb() {
 // Initialize database connection
 connectDb();
 
-app.use(cors({
-    origin: 'http://localhost:5173',  // Your frontend URL
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 app.post('/register',async(req,res)=>{
@@ -31,25 +28,36 @@ try{
     if (password!==confirm_password) {
         return res.json({
             success: false,
-             message: 'Passwords do not match' });
+            message: 'Passwords do not match'
+        });
     }
-    const user=new User({
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.json({
+            success: false,
+            message: 'Email already registered'
+        });
+    }
+
+    const user = new User({
         username,
         email,
         password
     });
     await user.save();
-    console.log(req.body);
+    console.log('New user registered:', email);
     res.json({
         success: true,
-         message: 'User registered successfully' }
-);
+        message: 'User registered successfully'
+    });
 }catch(e){
-    console.log(req.body);
+    console.log('Registration error:', e);
     res.json({
         success: false,
-         message: 'error' });
-    
+        message: e.message || 'Registration failed'
+    });
 }});
 
 app.post('/login',async(req,res)=>{
