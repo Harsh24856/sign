@@ -1,10 +1,28 @@
-const express=require('express');
-const app=express();
-const Connectbd=require('./database/db');
-const User=require('./database/user');
-const cors=require('cors');
-Connectbd();
-app.use(cors());
+const express = require('express');
+const app = express();
+const Connectbd = require('./database/db');
+const User = require('./database/user');
+const cors = require('cors');
+
+
+async function connectDb() {
+    try {
+        await Connectbd();
+        console.log('Connected to database');
+    }
+    catch(e) {
+        console.log('Connection error:', e.message);
+        process.exit(1);  // Exit if database connection fails
+    }
+}
+
+// Initialize database connection
+connectDb();
+
+app.use(cors({
+    origin: 'http://localhost:5173',  // Your frontend URL
+    credentials: true
+}));
 app.use(express.json());
 
 app.post('/register',async(req,res)=>{
@@ -81,6 +99,6 @@ app.post('/profile',async(req,res)=>{
     }
 });
 
-app.listen(2000,()=>{
+app.listen(2000, () => {
     console.log('Server is running on port 2000');
 });

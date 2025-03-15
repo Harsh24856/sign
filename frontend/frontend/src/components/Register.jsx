@@ -23,22 +23,16 @@ function Register() {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:2000/register", registerData);
-            console.log(response.data);
+            console.log('Server response:', response.data); // Debug log
             if (response.data.success) {
                 navigate("/login");
             } else {
                 alert(response.data.message);
             }
         } catch (error) {
-            console.log(error);
-            alert("Registration failed");
+            console.error('Registration error:', error);
+            alert(error.response?.data?.message || "Registration failed");
         }
-        setRegisterData({
-            username: "",
-            email: "",
-            password: "",
-            confirm_password: ""
-        });
     }
 
     return (
